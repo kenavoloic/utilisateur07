@@ -1,0 +1,144 @@
+import os
+import datetime
+from fractions import Fraction
+
+import pyexiv2
+from PIL import Image as PILImage
+from django.conf import settings
+from django.db import models
+
+
+class Galerie(models.Model):
+    pass
+
+
+class Collection(models.Model):
+    pass
+
+
+class Photo(models.Model):
+    """Photo chargée dans une galerie ou dans la collection d'une galerie"""
+
+    image        = models.ImageField(upload_to='photos/%Y/%m/')
+    nom_fichier  = models.CharField(max_length=255, editable=False)
+    taille       = models.PositiveIntegerField(null=True, help_text="octets")
+    largeur      = models.PositiveIntegerField(null=True, help_text="pixels")
+    hauteur      = models.PositiveIntegerField(null=True, help_text="pixels")
+
+    titre        = models.CharField(max_length=255, blank=True)
+    description  = models.TextField(blank=True)
+
+    date_prise_de_vue = models.DateTimeField(null=True, blank=True)
+    appareil     = models.CharField(max_length=100, blank=True)
+    objectif     = models.CharField(max_length=100, blank=True)
+    ouverture    = models.DecimalField(max_digits=4, decimal_places=1, null=True, blank=True)
+    vitesse      = models.CharField(max_length=20, blank=True)
+    iso          = models.PositiveIntegerField(null=True, blank=True)
+
+    latitude     = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    longitude    = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+
+    auteur       = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='photos',
+    )
+
+    def save(self, *args, **kwargs):
+        is_new = not self.pk
+        ancienne_image = None
+        if not is_new:
+            ancienne = Photo.objects.get(pk=self.pk)
+            ancienne_image = ancienne.image.name
+
+        super().save(*args, **kwargs)
+
+        image_changee = is_new or (ancienne_image and ancienne_image != self.image.name)
+        if image_changee:
+            self._extraire_metadonnees()
+            super().save(update_fields=[
+                'nom_fichier', 'taille', 'largeur', 'hauteur',
+                'titre', 'description', 'date_prise_de_vue',
+                'appareil', 'objectif', 'ouverture', 'vitesse', 'iso',
+                'latitude', 'longitude',
+            ])
+
+    def delete(self, *args, **kwargs):
+        chemin = self.image.path if self.image else None
+        super().delete(*args, **kwargs)
+        if chemin and os.path.isfile(chemin):
+            os.remove(chemin)
+
+    def _extraire_metadonnees(self):
+        chemin = self.image.path
+
+        self.nom_fichier = os.path.basename(chemin)
+        self.taille = os.path.getsize(chemin)
+
+        try:
+            with PILImage.open(chemin) as pil_img:
+                self.largeur, self.hauteur = pil_img.size
+        except Exception:
+            pass
+
+        try:
+            with pyexiv2.Image(chemin) as img:
+                exif = img.read_exif()
+                iptc = img.read_iptc()
+        except Exception:
+            return
+
+        marque = exif.get('Exif.Image.Make', '')
+        modele = exif.get('Exif.Image.Model', '')
+        self.appareil = f"{marque} {modele}".strip()
+
+        self.objectif = exif.get('Exif.Photo.LensModel', '')
+
+        fnumber = exif.get('Exif.Photo.FNumber')
+        if fnumber:
+            try:
+                self.ouverture = round(float(Fraction(fnumber)), 1)
+            except (ValueError, ZeroDivisionError):
+                pass
+
+        self.vitesse = exif.get('Exif.Photo.ExposureTime', '')
+
+        iso = exif.get('Exif.Photo.ISOSpeedRatings')
+        if iso:
+            try:
+                self.iso = int(iso)
+            except ValueError:
+                pass
+
+        date_str = exif.get('Exif.Photo.DateTimeOriginal')
+        if date_str:
+            try:
+                self.date_prise_de_vue = datetime.datetime.strptime(date_str, '%Y:%m:%d %H:%M:%S')
+            except ValueError:
+                pass
+
+        self.titre = iptc.get('Iptc.Application2.ObjectName', '')
+        self.description = iptc.get('Iptc.Application2.Caption', '')
+
+        try:
+            lat = exif.get('Exif.GPSInfo.GPSLatitude')
+            lat_ref = exif.get('Exif.GPSInfo.GPSLatitudeRef', 'N')
+            lon = exif.get('Exif.GPSInfo.GPSLongitude')
+            lon_ref = exif.get('Exif.GPSInfo.GPSLongitudeRef', 'E')
+
+            if lat and lon:
+                self.latitude = self._dms_en_decimal(lat)
+                self.longitude = self._dms_en_decimal(lon)
+                if lat_ref == 'S':
+                    self.latitude = -self.latitude
+                if lon_ref == 'W':
+                    self.longitude = -self.longitude
+        except Exception:
+            pass
+
+    @staticmethod
+    def _dms_en_decimal(dms_str):
+        d, m, s = [Fraction(x) for x in dms_str.split()]
+        return round(float(d) + float(m) / 60 + float(s) / 3600, 6)

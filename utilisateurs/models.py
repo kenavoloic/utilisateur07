@@ -7,7 +7,13 @@ class UtilisateurManager(BaseUserManager):
             raise ValueError("Une adresse email est requise.")
         email = self.normalize_email(email)
         if 'username' not in extra_fields:
-            extra_fields['username'] = email.split('@')[0]
+            base = email.split('@')[0]
+            username = base
+            n = 1
+            while self.model.objects.filter(username=username).exists():
+                username = f"{base}{n}"
+                n += 1
+            extra_fields['username'] = username
         if 'role' in extra_fields and extra_fields['role']:
             extra_fields['role'] = extra_fields['role'].upper() # toujours en capitale
         user = self.model(email=email, **extra_fields)
@@ -52,6 +58,9 @@ class Utilisateur(AbstractUser):
         elif self.role == Utilisateur.Role.PHOTOGRAPHE:
             self.is_staff = True
             self.is_superuser = True
+        else:
+            self.is_staff = False
+            self.is_superuser = False
         super().save(*args, **kwargs)
 
     def __str__(self):
