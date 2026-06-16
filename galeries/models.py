@@ -27,11 +27,28 @@ def photo_upload_path(instance, filename):
 
 
 class Galerie(models.Model):
-    pass
+    nom = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True, blank=True)
+    description = models.CharField(max_length=255, blank=True)
+    est_publique = models.BooleanField(default=True)
+    #created_at = models.DateTimeField(auto_now_add=True)
+    #updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Galerie"
+        verbose_name_plural = "Galeries"
+
+    def __str__(self):
+        return self.nom
+
 
 
 class Collection(models.Model):
-    pass
+    galerie = models.ForeignKey(
+        Galerie,
+        on_delete=models.CASCADE,
+        related_name='collections',
+    )
 
 
 class Photo(models.Model):
@@ -59,6 +76,17 @@ class Photo(models.Model):
     auteur_nom = models.CharField(max_length=255, null=True, blank=True)
     auteur_prenom = models.CharField(max_length=255, null=True, blank=True)
     auteur_email = models.EmailField(max_length=255, null=True, blank=True)
+
+    galeries = models.ManyToManyField(
+        Galerie,
+        blank=True,
+        related_name='photos',
+    )
+    collections = models.ManyToManyField(
+        Collection,
+        blank=True,
+        related_name='photos',
+    )
 
     def save(self, *args, **kwargs):
         is_new = not self.pk

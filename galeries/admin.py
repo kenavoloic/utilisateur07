@@ -6,8 +6,21 @@ from django.shortcuts import render
 from django.urls import path
 from django.utils.html import format_html
 
-from .models import Photo
+from .models import Photo, Galerie, Collection
 from utilisateurs.models import Utilisateur
+
+
+class RolesContributeursMixin:
+    liste_roles_contributeurs = {Utilisateur.Role.ASSISTANT, Utilisateur.Role.PHOTOGRAPHE}
+
+    def has_add_permission(self, request):
+        return request.user.role in self.liste_roles_contributeurs
+
+    def has_change_permission(self, request, obj=None):
+        return request.user.role in self.liste_roles_contributeurs
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.role in self.liste_roles_contributeurs
 
 class MultipleFileInput(ClearableFileInput):
     allow_multiple_selected = True
@@ -36,12 +49,12 @@ class DefinirAuteurForm(forms.Form):
 
 
 @admin.register(Photo)
-class PhotoAdmin(admin.ModelAdmin):
+class PhotoAdmin(RolesContributeursMixin, admin.ModelAdmin):
 
     #list_display    = ('vignette', 'nom_fichier', 'appareil', 'date_prise_de_vue', 'largeur', 'hauteur', 'taille_mo')
 
-    liste_roles_contributeurs = {Utilisateur.Role.ASSISTANT, Utilisateur.Role.PHOTOGRAPHE}
     actions = ['definir_auteur']
+    filter_horizontal = ('galeries', 'collections')
 
     list_display    = ('vignette', 'nom_fichier', 'appareil', 'date_prise_de_vue', 'taille_mo')
     list_filter     = ('appareil', 'date_prise_de_vue')
@@ -58,6 +71,9 @@ class PhotoAdmin(admin.ModelAdmin):
         }),
         ("Contenu", {
             "fields": ('titre', 'description'),
+        }),
+        ("Galeries", {
+            "fields": ('galeries', 'collections'),
         }),
         ("Prise de vue", {
             "fields": ('date_prise_de_vue', 'appareil', 'objectif', 'ouverture', 'vitesse', 'iso'),
@@ -82,15 +98,6 @@ class PhotoAdmin(admin.ModelAdmin):
         if obj.image:
             return format_html('<img src="{}" style="height:60px; border-radius:4px;">', obj.image.url)
         return '-'
-
-    def has_add_permission(self, request):
-        return request.user.role in self.liste_roles_contributeurs
-
-    def has_change_permission(self, request, obj=None):
-        return request.user.role in self.liste_roles_contributeurs
-
-    def has_delete_permission(self, request, obj=None):
-        return request.user.role in self.liste_roles_contributeurs
 
     @admin.action(description="Définir l'auteur des photos sélectionnées")
     def definir_auteur(self, request, queryset):
@@ -158,3 +165,23 @@ class PhotoAdmin(admin.ModelAdmin):
             'opts': self.model._meta,
         }
         return render(request, 'admin/galeries/photo/batch_upload.html', context)
+
+
+class CollectionInline(admin.TabularInline):
+    model = Collection
+    extra = 1
+
+
+@admin.register(Galerie)
+class GalerieAdmin(RolesContributeursMixin, admin.ModelAdmin):
+    list_display = ('nom', 'slug', 'est_publique')
+    list_filter = ('est_publique',)
+    search_fields = ('nom', 'description')
+    prepopulated_fields = {'slug': ('nom',)}
+    inlines = [CollectionInline]
+
+
+@admin.register(Collection)
+class CollectionAdmin(RolesContributeursMixin, admin.ModelAdmin):
+    list_display = ('id', 'galerie')
+    list_filter = ('galerie',)
