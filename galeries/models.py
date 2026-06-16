@@ -32,6 +32,8 @@ class Galerie(models.Model):
     slug = models.SlugField(unique=True, blank=True)
     description = models.CharField(max_length=255, blank=True)
     est_publique = models.BooleanField(default=True)
+
+    masonry_layout_manuel = models.BooleanField(default=True, verbose_name="Masonry manuel", help_text="Ordre d'affichage défini par le photographe.",)
     #created_at = models.DateTimeField(auto_now_add=True)
     #updated_at = models.DateTimeField(auto_now=True)
 
@@ -81,6 +83,8 @@ class Collection(models.Model):
         related_name='collections',
     )
 
+    masonry_layout_manuel = models.BooleanField(default=True, verbose_name="Masonry manuel", help_text="Ordre d'affichage défini par le photographe.",)
+        
     class Meta:
         unique_together = ('galerie', 'slug')
 

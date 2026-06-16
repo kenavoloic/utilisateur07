@@ -248,7 +248,7 @@ class CollectionInline(admin.TabularInline):
 
 @admin.register(Galerie)
 class GalerieAdmin(RolesContributeursMixin, admin.ModelAdmin):
-    list_display = ('nom', 'slug', 'est_publique', 'nombre_collections_admin', 'nombre_total_photos_admin')
+    list_display = ('nom', 'slug', 'est_publique', 'masonry_layout_manuel', 'nombre_collections_admin', 'nombre_total_photos_admin')
     list_filter = ('est_publique',)
     search_fields = ('nom', 'description')
     readonly_fields = ('slug',)
@@ -270,7 +270,7 @@ class GalerieAdmin(RolesContributeursMixin, admin.ModelAdmin):
 
 @admin.register(Collection)
 class CollectionAdmin(RolesContributeursMixin, admin.ModelAdmin):
-    list_display = ('nom', 'slug', 'galerie', 'nombre_photos_admin')
+    list_display = ('nom', 'slug', 'galerie', 'masonry_layout_manuel', 'nombre_photos_admin')
     list_filter = ('galerie',)
     readonly_fields = ('slug',)
 
