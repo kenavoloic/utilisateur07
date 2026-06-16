@@ -18,7 +18,7 @@ class PhotoStorage(FileSystemStorage):
         compteur = 1
         nouveau_nom = name
         while self.exists(nouveau_nom):
-            nouveau_nom = f"{base}_{compteur:02d}{ext}"
+            nouveau_nom = f"{base}_{compteur:03d}{ext}"
             compteur += 1
         return nouveau_nom
 
@@ -28,7 +28,7 @@ def photo_upload_path(instance, filename):
 
 
 class Galerie(models.Model):
-    nom = models.CharField(max_length=200)
+    nom = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, blank=True)
     description = models.CharField(max_length=255, blank=True)
     est_publique = models.BooleanField(default=True)
@@ -58,7 +58,7 @@ class Galerie(models.Model):
 
 
 class Collection(models.Model):
-    nom = models.CharField(max_length=200)
+    nom = models.CharField(max_length=255)
     slug = models.SlugField(blank=True)
     galerie = models.ForeignKey(
         Galerie,
@@ -88,7 +88,7 @@ class Collection(models.Model):
 
 
 class Tag(models.Model):
-    nom = models.CharField(max_length=100, unique=True)
+    nom = models.CharField(max_length=255, unique=True)
     slug = models.SlugField(unique=True, blank=True)
 
     class Meta:
@@ -126,8 +126,8 @@ class Photo(models.Model):
     description  = models.TextField(blank=True)
 
     date_prise_de_vue = models.DateTimeField(null=True, blank=True)
-    appareil     = models.CharField(max_length=100, blank=True)
-    objectif     = models.CharField(max_length=100, blank=True)
+    appareil     = models.CharField(max_length=255, blank=True)
+    objectif     = models.CharField(max_length=255, blank=True)
     ouverture    = models.DecimalField(max_digits=4, decimal_places=1, null=True, blank=True)
     vitesse      = models.CharField(max_length=20, blank=True)
     iso          = models.PositiveIntegerField(null=True, blank=True, verbose_name="ISO")
@@ -139,16 +139,24 @@ class Photo(models.Model):
     auteur_prenom = models.CharField(max_length=255, null=True, blank=True)
     auteur_email = models.EmailField(max_length=255, null=True, blank=True)
 
+    # une photo peut appartenir à plusieurs galeries  en même temps
+    # en cas de suppression d'une galerie les photos demeurent
     galeries = models.ManyToManyField(
         Galerie,
         blank=True,
         related_name='photos',
     )
+    
+    # une photo peut appartenir à plusieurs collections en même temps
+    # en cas de suppression d'une collection les photos demeurent
     collections = models.ManyToManyField(
         Collection,
         blank=True,
         related_name='photos',
     )
+    
+    # un tag va nécessairement s'appliquer à plusieurs images
+    # un tag est nécessairement unique
     tags = models.ManyToManyField(
         Tag,
         blank=True,
