@@ -243,7 +243,7 @@ class PhotoAdmin(RolesContributeursMixin, admin.ModelAdmin):
 class CollectionInline(admin.TabularInline):
     model = Collection
     extra = 1
-    readonly_fields = ('slug',)
+    fields = ('nom',)
 
 
 @admin.register(Galerie)
