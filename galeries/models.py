@@ -32,7 +32,7 @@ class Photo(models.Model):
     objectif     = models.CharField(max_length=100, blank=True)
     ouverture    = models.DecimalField(max_digits=4, decimal_places=1, null=True, blank=True)
     vitesse      = models.CharField(max_length=20, blank=True)
-    iso          = models.PositiveIntegerField(null=True, blank=True)
+    iso          = models.PositiveIntegerField(null=True, blank=True, verbose_name="ISO")
 
     latitude     = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     longitude    = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
