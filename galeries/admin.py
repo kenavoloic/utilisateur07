@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.urls import path
 from django.utils.html import format_html
 
-from .models import Photo, Galerie, Collection
+from .models import Photo, Galerie, Collection, Tag
 from utilisateurs.models import Utilisateur
 
 
@@ -62,7 +62,7 @@ class PhotoAdmin(RolesContributeursMixin, admin.ModelAdmin):
     #list_display    = ('vignette', 'nom_fichier', 'appareil', 'date_prise_de_vue', 'largeur', 'hauteur', 'taille_mo')
 
     actions = ['definir_auteur', 'ajouter_a_galerie', 'ajouter_a_collection']
-    filter_horizontal = ('galeries', 'collections')
+    filter_horizontal = ('galeries', 'collections', 'tags')
 
     list_display    = ('vignette', 'nom_fichier', 'appareil', 'date_prise_de_vue', 'taille_mo')
     list_filter     = ('appareil', 'date_prise_de_vue')
@@ -81,7 +81,7 @@ class PhotoAdmin(RolesContributeursMixin, admin.ModelAdmin):
             "fields": ('titre', 'description'),
         }),
         ("Galeries", {
-            "fields": ('galeries', 'collections'),
+            "fields": ('galeries', 'collections', 'tags'),
         }),
         ("Prise de vue", {
             "fields": ('date_prise_de_vue', 'appareil', 'objectif', 'ouverture', 'vitesse', 'iso'),
@@ -238,6 +238,7 @@ class PhotoAdmin(RolesContributeursMixin, admin.ModelAdmin):
 class CollectionInline(admin.TabularInline):
     model = Collection
     extra = 1
+    readonly_fields = ('slug',)
 
 
 @admin.register(Galerie)
@@ -245,11 +246,19 @@ class GalerieAdmin(RolesContributeursMixin, admin.ModelAdmin):
     list_display = ('nom', 'slug', 'est_publique')
     list_filter = ('est_publique',)
     search_fields = ('nom', 'description')
-    prepopulated_fields = {'slug': ('nom',)}
+    readonly_fields = ('slug',)
     inlines = [CollectionInline]
 
 
 @admin.register(Collection)
 class CollectionAdmin(RolesContributeursMixin, admin.ModelAdmin):
-    list_display = ('nom', 'galerie')
+    list_display = ('nom', 'slug', 'galerie')
     list_filter = ('galerie',)
+    readonly_fields = ('slug',)
+
+
+@admin.register(Tag)
+class TagAdmin(RolesContributeursMixin, admin.ModelAdmin):
+    list_display = ('nom', 'slug')
+    search_fields = ('nom',)
+    readonly_fields = ('slug',)

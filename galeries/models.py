@@ -7,6 +7,7 @@ from PIL import Image as PILImage
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.db import models
+from django.utils.text import slugify
 
 
 class PhotoStorage(FileSystemStorage):
@@ -41,18 +42,75 @@ class Galerie(models.Model):
     def __str__(self):
         return self.nom
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = self._generer_slug_unique()
+        super().save(*args, **kwargs)
+
+    def _generer_slug_unique(self):
+        slug_base = slugify(self.nom)
+        slug = slug_base
+        compteur = 1
+        while Galerie.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+            compteur += 1
+            slug = f"{slug_base}-{compteur}"
+        return slug
 
 
 class Collection(models.Model):
     nom = models.CharField(max_length=200)
+    slug = models.SlugField(blank=True)
     galerie = models.ForeignKey(
         Galerie,
         on_delete=models.CASCADE,
         related_name='collections',
     )
 
+    class Meta:
+        unique_together = ('galerie', 'slug')
+
     def __str__(self):
         return self.nom
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = self._generer_slug_unique()
+        super().save(*args, **kwargs)
+
+    def _generer_slug_unique(self):
+        slug_base = slugify(self.nom)
+        slug = slug_base
+        compteur = 1
+        while Collection.objects.filter(galerie=self.galerie, slug=slug).exclude(pk=self.pk).exists():
+            compteur += 1
+            slug = f"{slug_base}-{compteur}"
+        return slug
+
+
+class Tag(models.Model):
+    nom = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(unique=True, blank=True)
+
+    class Meta:
+        verbose_name = "Tag"
+        verbose_name_plural = "Tags"
+
+    def __str__(self):
+        return self.nom
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = self._generer_slug_unique()
+        super().save(*args, **kwargs)
+
+    def _generer_slug_unique(self):
+        slug_base = slugify(self.nom)
+        slug = slug_base
+        compteur = 1
+        while Tag.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+            compteur += 1
+            slug = f"{slug_base}-{compteur}"
+        return slug
 
 
 class Photo(models.Model):
@@ -88,6 +146,11 @@ class Photo(models.Model):
     )
     collections = models.ManyToManyField(
         Collection,
+        blank=True,
+        related_name='photos',
+    )
+    tags = models.ManyToManyField(
+        Tag,
         blank=True,
         related_name='photos',
     )
