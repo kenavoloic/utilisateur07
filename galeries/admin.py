@@ -7,7 +7,7 @@ from django.urls import path
 from django.utils.html import format_html
 
 from .models import Photo
-
+from utilisateurs.models import Utilisateur
 
 class MultipleFileInput(ClearableFileInput):
     allow_multiple_selected = True
@@ -33,6 +33,9 @@ class BatchUploadForm(forms.Form):
 class PhotoAdmin(admin.ModelAdmin):
 
     #list_display    = ('vignette', 'nom_fichier', 'appareil', 'date_prise_de_vue', 'largeur', 'hauteur', 'taille_mo')
+
+    liste_roles_contributeurs = {Utilisateur.Role.ASSISTANT, Utilisateur.Role.PHOTOGRAPHE}
+    
     list_display    = ('vignette', 'nom_fichier', 'appareil', 'date_prise_de_vue', 'taille_mo')
     list_filter     = ('appareil', 'date_prise_de_vue')
     search_fields   = ('nom_fichier', 'titre', 'description', 'appareil', 'objectif')
@@ -74,13 +77,13 @@ class PhotoAdmin(admin.ModelAdmin):
         return '-'
 
     def has_add_permission(self, request):
-        return request.user.role in ('PHOTOGRAPHE', 'ASSISTANT')
+        return request.user.role in self.liste_roles_contributeurs
 
     def has_change_permission(self, request, obj=None):
-        return request.user.role in ('PHOTOGRAPHE', 'ASSISTANT')
+        return request.user.role in self.liste_roles_contributeurs
 
     def has_delete_permission(self, request, obj=None):
-        return request.user.role in ('PHOTOGRAPHE', 'ASSISTANT')
+        return request.user.role in self.liste_roles_contributeurs
 
     def get_urls(self):
         urls = super().get_urls()
