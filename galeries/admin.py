@@ -32,7 +32,8 @@ class BatchUploadForm(forms.Form):
 @admin.register(Photo)
 class PhotoAdmin(admin.ModelAdmin):
 
-    list_display    = ('vignette', 'nom_fichier', 'appareil', 'date_prise_de_vue', 'largeur', 'hauteur', 'taille_mo')
+    #list_display    = ('vignette', 'nom_fichier', 'appareil', 'date_prise_de_vue', 'largeur', 'hauteur', 'taille_mo')
+    list_display    = ('vignette', 'nom_fichier', 'appareil', 'date_prise_de_vue', 'taille_mo')
     list_filter     = ('appareil', 'date_prise_de_vue')
     search_fields   = ('nom_fichier', 'titre', 'description', 'appareil', 'objectif')
     readonly_fields = (
@@ -43,7 +44,7 @@ class PhotoAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ("Fichier", {
-            "fields": ('vignette', 'image', 'nom_fichier', 'taille_mo', 'largeur', 'hauteur', 'auteur'),
+            "fields": ('vignette', 'image', 'nom_fichier', 'taille_mo', 'largeur', 'hauteur', 'auteur_nom', 'auteur_prenom', 'auteur_email'),
         }),
         ("Contenu", {
             "fields": ('titre', 'description'),
@@ -64,7 +65,7 @@ class PhotoAdmin(admin.ModelAdmin):
     def taille_mo(self, obj):
         if obj.taille is None:
             return '-'
-        return f"{obj.taille / (1024 * 1024):.2f} Mo"
+        return f"{round(obj.taille / (1024 * 1024), 2)} Mo"
 
     @admin.display(description='Vignette')
     def vignette(self, obj):
@@ -99,7 +100,7 @@ class PhotoAdmin(admin.ModelAdmin):
                 fichiers = request.FILES.getlist('images')
                 nb_succes = 0
                 for fichier in fichiers:
-                    photo = Photo(auteur=request.user)
+                    photo = Photo()
                     photo.image.save(fichier.name, fichier, save=True)
                     nb_succes += 1
                 messages.success(request, f"{nb_succes} photo(s) uploadée(s) avec succès.")

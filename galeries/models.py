@@ -1,12 +1,11 @@
-import os
 import datetime
 from fractions import Fraction
-
+import os
 import pyexiv2
 from PIL import Image as PILImage
+
 from django.conf import settings
 from django.db import models
-
 
 class Galerie(models.Model):
     pass
@@ -38,13 +37,17 @@ class Photo(models.Model):
     latitude     = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     longitude    = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
 
-    auteur       = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='photos',
-    )
+    # auteur       = models.ForeignKey(
+    #     settings.AUTH_USER_MODEL,
+    #     on_delete=models.SET_NULL,
+    #     null=True,
+    #     blank=True,
+    #     related_name='photos',
+    # )
+
+    auteur_nom = models.CharField(max_length=255, null=True, blank=True)
+    auteur_prenom = models.CharField(max_length=255, null=True, blank=True)
+    auteur_email = models.EmailField(max_length=255, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         is_new = not self.pk
