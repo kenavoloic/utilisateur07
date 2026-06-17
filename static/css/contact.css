@@ -1,0 +1,634 @@
+/* contact.css - Styles pour la page de contact */
+
+.contact-section {
+  padding: 2rem var(--spacing-page);
+  max-width: 75rem;
+  margin: 0 auto;
+}
+
+.contact-content {
+  margin-bottom: 4rem;
+}
+
+/* Messages Django */
+.messages {
+  margin-bottom: 2rem;
+}
+
+.message {
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.message-success {
+  background: #10b981;
+  color: white;
+  border-left: 0.25rem solid #059669;
+}
+
+.message-error {
+  background: #ef4444;
+  color: white;
+  border-left: 0.25rem solid #dc2626;
+}
+
+.message-info {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-left: 0.25rem solid var(--color-accent);
+}
+
+/* Grille contact */
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+}
+
+/* Formulaire de contact */
+.contact-form-container {
+  background: var(--color-surface);
+  padding: 2.5rem;
+  border-radius: var(--radius-lg);
+  border: 0.0625rem solid var(--color-border);
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.05);
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  margin-bottom: 1.5rem;
+  color: var(--color-text);
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 480px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Labels flottants avec cadre visuel */
+.floating-group {
+  position: relative;
+  margin-bottom: 1.5rem;
+  border: 0.0625rem solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0.5rem;
+}
+
+.floating-label {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--color-bg);
+  padding: 0 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-muted);
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+}
+
+/* Pour les textarea, ajustement de position */
+.floating-group:has(textarea) .floating-label {
+  top: 1.5rem;
+  transform: none;
+}
+
+/* Label actif (focus ou contenu) */
+.floating-input:focus + .floating-label,
+.floating-input:not(:placeholder-shown) + .floating-label,
+.floating-input:valid + .floating-label {
+  top: -0.5rem;
+  transform: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+/* Style de base pour les champs */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-text);
+  letter-spacing: 0.01em;
+}
+
+/* Styles des champs avec labels flottants - sans bordure individuelle */
+.floating-input {
+  padding: 1rem;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-text);
+  font-size: 0.95rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 0;
+  width: 100%;
+  outline: none;
+}
+
+/* Focus sur le groupe entier */
+.floating-group:focus-within {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 0.1875rem var(--color-accent-alpha);
+  transform: translateY(-0.0625rem);
+}
+
+/* Animation de validation temps réel sur le groupe */
+.floating-group:has(.floating-input:valid) {
+  border-color: #10b981;
+}
+
+.floating-group:has(.floating-input:invalid:not(:focus):not(:placeholder-shown)) {
+  border-color: #ef4444;
+}
+
+/* Styles spécifiques pour select */
+.floating-input.form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.75rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 3rem;
+}
+
+/* Textarea spécial pour labels flottants */
+.floating-input.form-textarea {
+  resize: vertical;
+  min-height: 7.5rem;
+  font-family: inherit;
+  line-height: 1.5;
+  padding-top: 1.5rem;
+}
+
+/* Ajustement spécifique pour le groupe textarea */
+.floating-group:has(textarea) {
+  min-height: 10rem;
+  padding-bottom: 1rem;
+}
+
+/* Métadonnées du formulaire */
+.form-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+/* Compteur de caractères */
+.char-counter {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.char-counter.warning {
+  color: #f59e0b;
+}
+
+.char-counter.danger {
+  color: #ef4444;
+}
+
+/* Statut de validation en temps réel */
+.form-status {
+  font-size: 0.8rem;
+  min-height: 1rem;
+  transition: all 0.2s ease;
+}
+
+.form-status.valid {
+  color: #10b981;
+}
+
+.form-status.invalid {
+  color: #ef4444;
+}
+
+.form-help {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  margin-top: 0.25rem;
+}
+
+.form-errors {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.form-error {
+  font-size: 0.8rem;
+  color: #ef4444;
+  font-weight: 500;
+}
+
+/* Bouton avec états */
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2.5rem;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.01em;
+  overflow: hidden;
+}
+
+.btn-primary {
+  background: var(--color-accent);
+  color: white;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+  transform: translateY(-0.125rem);
+  box-shadow: 0 0.5rem 1rem var(--color-accent-alpha);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* États du bouton de chargement */
+.btn-loading .btn-loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-loading.loading .btn-text {
+  opacity: 0;
+}
+
+.btn-loading.loading .btn-loader {
+  opacity: 1;
+}
+
+.btn-loading.loading {
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Spinner */
+.spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 0.125rem solid rgba(255, 255, 255, 0.3);
+  border-top: 0.125rem solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Informations de contact */
+.contact-info-container {
+  padding: 2rem;
+}
+
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.contact-item {
+  padding: 1.5rem;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  border-left: 0.1875rem solid var(--color-accent);
+}
+
+.contact-item h3 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+  color: var(--color-text);
+  letter-spacing: 0.01em;
+}
+
+.contact-item p {
+  line-height: 1.6;
+  color: var(--color-muted);
+  margin: 0;
+}
+
+.contact-item ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  line-height: 1.6;
+  color: var(--color-muted);
+}
+
+.contact-item ul li {
+  margin-bottom: 0.25rem;
+}
+
+/* Améliorations pour les labels flottants sur mobile */
+@media (max-width: 768px) {
+  .contact-section {
+    padding: 1.5rem var(--spacing-page);
+  }
+  
+  .contact-form-container,
+  .contact-info-container {
+    padding: 1.5rem;
+  }
+  
+  .section-title {
+    font-size: 1.3rem;
+  }
+  
+  /* Ajustement des labels flottants et cadres */
+  .floating-group {
+    padding: 0.25rem;
+  }
+  
+  .floating-input {
+    padding: 1rem 0.75rem;
+    font-size: 1rem; /* Évite le zoom sur iOS */
+  }
+  
+  .floating-label {
+    left: 1rem; /* Ajusté pour le padding du groupe */
+  }
+  
+  .form-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .contact-section {
+    padding: 1rem var(--spacing-page);
+  }
+  
+  .contact-form-container,
+  .contact-info-container {
+    padding: 1rem;
+  }
+  
+  .btn {
+    width: 100%;
+    padding: 1rem 2rem;
+  }
+  
+  /* Espacement réduit pour mobiles */
+  .floating-group {
+    margin-bottom: 1rem;
+    padding: 0.25rem;
+  }
+  
+  .contact-form {
+    gap: 0;
+  }
+  
+  /* Ajustement cadres pour très petits écrans */
+  .floating-group:has(textarea) {
+    min-height: 8.75rem;
+  }
+}
+
+/* États focus améliorés - déjà géré par :focus-within */
+.floating-group.focused {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 0.1875rem var(--color-accent-alpha);
+  transform: translateY(-0.0625rem);
+}
+
+/* États de validation visuels pour les cadres */
+.floating-group.field-valid {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.02);
+}
+
+.floating-group.field-invalid {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.02);
+}
+
+.floating-group:hover:not(:focus-within) {
+  border-color: var(--color-accent);
+  box-shadow: 0 0.0625rem 0.1875rem rgba(0, 0, 0, 0.1);
+}
+
+/* Animation douce pour les messages de validation */
+.form-status {
+  opacity: 0;
+  transform: translateY(-0.625rem);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-top: 0.5rem;
+  padding: 0 0.5rem;
+}
+
+.form-status.valid,
+.form-status.invalid {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Amélioration de l'apparence du select */
+.floating-input.form-select:focus {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23your-accent-color' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+}
+
+/* Custom Select Component */
+.custom-select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.custom-select-trigger {
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-text);
+  font-size: 0.95rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+  outline: none;
+}
+
+.custom-select-trigger .placeholder-text {
+  color: var(--color-muted);
+  font-style: italic;
+}
+
+.custom-select-trigger .selected-text {
+  color: var(--color-text);
+}
+
+.custom-select-trigger.has-selection .placeholder-text {
+  display: none;
+}
+
+.custom-select-trigger.has-selection .selected-text {
+  display: block;
+}
+
+.select-arrow {
+  color: var(--color-muted);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.custom-select-trigger[aria-expanded="true"] .select-arrow {
+  transform: rotate(180deg);
+}
+
+.custom-select-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--color-bg);
+  border: 0.0625rem solid var(--color-border);
+  border-top: none;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  max-height: 12.5rem;
+  overflow-y: auto;
+}
+
+.custom-select-options.hidden {
+  display: none;
+}
+
+.select-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border-bottom: 0.0625rem solid var(--color-border);
+}
+
+.select-option:last-child {
+  border-bottom: none;
+}
+
+.select-option:hover,
+.select-option:focus {
+  background: var(--color-surface);
+}
+
+.select-option.selected {
+  background: var(--color-accent-alpha);
+  color: var(--color-accent);
+}
+
+.option-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.option-text {
+  flex: 1;
+  font-weight: 500;
+}
+
+.hidden-select {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Focus state for custom select */
+.floating-group:has(.custom-select-trigger:focus) {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 0.1875rem var(--color-accent-alpha);
+  transform: translateY(-0.0625rem);
+}
+
+/* Label animation for custom select */
+.custom-select-trigger:focus + .floating-label,
+.custom-select-trigger.has-selection + .floating-label {
+  top: -0.5rem;
+  transform: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .custom-select-options {
+    max-height: 10rem;
+  }
+  
+  .select-option {
+    padding: 0.875rem;
+  }
+  
+  .option-icon {
+    font-size: 1rem;
+  }
+}
